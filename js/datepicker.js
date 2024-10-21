@@ -1,5 +1,5 @@
 /**
- * DatePicker 1.0.0
+ * DatePicker 1.0.2
  * 
  * A jQuery-based DatePicker that provides an easy way of creating both single
  * and multi-viewed calendars capable of accepting single, range, and multiple
@@ -149,6 +149,12 @@
          * parseable by Date.parse().  Defaults to todays date.
          */
         current: null,
+        /**
+         * Optional date range which limits the selectable dates. The range of acceptable dates,
+         * in an array of [min, max], disables any date outside of the range. Arguments should be
+         * Date objects.
+         */
+        selectableDates: null,
         /**
          * true causes the datepicker calendar to be appended to the DatePicker 
          * element and rendered, false binds the DatePicker to an event on the trigger element
@@ -343,11 +349,15 @@
             if (today.getDate() == date.getDate() && today.getMonth() == date.getMonth() && today.getYear() == date.getYear()) {
               data.weeks[indic].days[indic2].classname.push('datepickerToday');
             }
-            if (date > today) {
+            if($.isArray(options.selectableDates) && options.selectableDates.length == 2) {
+              if(date < options.selectableDates[0] || date > options.selectableDates[1]) {
+                data.weeks[indic].days[indic2].classname.push('datepickerFuture');
+                data.weeks[indic].days[indic2].classname.push('datepickerDisabled');
+              }
+            } else if (date > today) {
               // current month, date in future
               data.weeks[indic].days[indic2].classname.push('datepickerFuture');
             }
-            
             if (month != date.getMonth()) {
               data.weeks[indic].days[indic2].classname.push('datepickerNotInMonth');
               // disable clicking of the 'not in month' cells
@@ -688,7 +698,6 @@
           var viewPort = getViewport();
           var top = pos.top;
           var left = pos.left;
-          var oldDisplay = $.curCSS(calEl, 'display');
           cal.css({
             visibility: 'hidden',
             display: 'block'
@@ -917,7 +926,6 @@
           if ($(this).data('datepickerId')) {
             var cal = $('#' + $(this).data('datepickerId'));
             var options = cal.data('datepicker');
-            options.lastSel = false;
             options.date = normalizeDate(options.mode, date);
             
             if (shiftTo) {
@@ -940,7 +948,7 @@
        * @see DatePickerGetDate()
        */
       getDate: function() {
-        if (this.size() > 0) {
+        if (this.length > 0) {
           return prepareDate($('#' + $(this).data('datepickerId')).data('datepicker'));
         }
       },
@@ -960,7 +968,6 @@
             } else {
               options.date = [];
             }
-            options.lastSel = false;
             fill(cal.get(0));
           }
         });
@@ -1025,5 +1032,4 @@
     // Provide some basic currying to the user
     return data ? fn( data ) : fn;
   };
-
 })(jQuery);
