@@ -1,0 +1,7 @@
+{
+  "name": "DatePicker",
+  "version": "1.0.2",
+  "main": "js/datepicker.js",
+  "packageManager": "yarn@4.2.2",
+  "dependencies": {}
+}
